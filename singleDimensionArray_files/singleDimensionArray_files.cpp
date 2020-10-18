@@ -114,12 +114,23 @@ int main()
 			while (!massfile.eof())
 			{
 				massfile >> sizeMassfile;
-
+				if (sizeMassfile <= 0)
+				{
+					throw std::exception("Память не может быть веделена!");
+					return 1;
+				}
 				int* arrayFromFile = new int[sizeMassfile];
 				for (int i = 0; i < sizeMassfile; i++)
 				{
 					massfile >> arrayFromFile[i];
 				}
+				std::cout << "Вывод массива из файла: " << std::endl;
+				outArray(arrayFromFile, sizeMassfile);
+
+				std::cout << "Hаибольшую длинa монотонного убывающего фрагмента последовательности = ";
+				std::cout << isMonotoneDecreasing(arrayFromFile, sizeMassfile) << std::endl;
+
+				delete[] arrayFromFile;
 			}
 		}
 		else
