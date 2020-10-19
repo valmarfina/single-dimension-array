@@ -2,16 +2,17 @@
 #include <ctime> 
 #include <fstream> 
 #include <string>
+#include <filesystem>
 
 using std::ifstream; //Входной файловый поток
 using std::ofstream;// Выходной файловый поток
-
 
 //ИНДИВИДУАЛЬНОЕ
 // 13 Вариант
 //В массиве целых чисел определить наибольшую длину
 //монотонного убывающего фрагмента последовательности 
 //(то есть такого фрагмента, где каждый элемент меньше предыдущего)
+
 void outArray(int array[], const int SIZE)
 {
 	for (int i = 0; i < SIZE; i++)
@@ -54,6 +55,11 @@ int isMonotoneDecreasing(int array[], const int SIZE)
 	return max;
 }
 
+bool isEmpty(std::ifstream& pFile)
+{
+	return pFile.peek() == std::ifstream::traits_type::eof();
+}
+
 int main()
 {
 	setlocale(LC_ALL, "Russian");
@@ -71,7 +77,7 @@ int main()
 		}
 		else if (size_array <= 0)
 		{
-			throw std::exception("Память не может быть веделена!");
+			throw std::exception("Память не может быть выделена!");
 			return 1;
 		}
 
@@ -84,7 +90,7 @@ int main()
 
 
 		random(mas_array, size_array);
-		std::cout << "Вывод массива: " << std::endl;
+		std::cout << "Вывод динамического массива: " << std::endl;
 		outArray(mas_array, size_array);
 
 		std::cout << "Hаибольшую длинa монотонного убывающего фрагмента последовательности = ";
@@ -104,51 +110,48 @@ int main()
 
 		std::cout << "======================================================================================" << std::endl;
 
+
 		//массивы из файла
 		std::ifstream massfile;
 		massfile.open("mass.txt");
 
-
-		if (!massfile.eof())//  файл не пуст
+		if (!massfile)
 		{
-			while (!massfile.eof())
-			{
-				massfile >> sizeMassfile;
-				if (sizeMassfile <= 0)
-				{
-					throw std::exception("Память не может быть веделена!");
-					return 1;
-				}
-				int* arrayFromFile = new int[sizeMassfile];
-				for (int i = 0; i < sizeMassfile; i++)
-				{
-					massfile >> arrayFromFile[i];
-				}
-				std::cout << "Вывод массива из файла: " << std::endl;
-				outArray(arrayFromFile, sizeMassfile);
-
-				std::cout << "Hаибольшую длинa монотонного убывающего фрагмента последовательности = ";
-				std::cout << isMonotoneDecreasing(arrayFromFile, sizeMassfile) << std::endl;
-
-				delete[] arrayFromFile;
-			}
+			throw std::exception("Файл не открыт!");
+			return 1;
 		}
-		else
+		if (isEmpty(massfile))// файл пуст
 		{
 			throw std::exception("Файл пуст!");
 			return 1;
 		}
+		while (!massfile.eof())// пробегаем пока не встретим конец файла eof
+		{
+			massfile >> sizeMassfile;
+			if (sizeMassfile <= 0)
+			{
+				throw std::exception("Память не может быть выделена!");
+				return 1;
+			}
+			int* arrayFromFile = new int[sizeMassfile];
+
+			for (int i = 0; i < sizeMassfile; i++)
+			{
+				massfile >> arrayFromFile[i];
+			}
+			std::cout << "Вывод массива из файла: " << std::endl;
+			outArray(arrayFromFile, sizeMassfile);
+
+			std::cout << "Hаибольшую длинa монотонного убывающего фрагмента последовательности = ";
+			std::cout << isMonotoneDecreasing(arrayFromFile, sizeMassfile) << std::endl;
+
+			delete[] arrayFromFile;
+		}
 		massfile.close();
 	}
-
 	catch (const std::exception& e)
 	{
 		std::cerr << e.what() << std::endl;
-		return 1;
-	}
-	catch (const std::string& error)
-	{
-		std::cerr << std::endl << "Ошибка: файл " << error << std::endl;
 		return 1;
 	}
 
